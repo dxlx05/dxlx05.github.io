@@ -1,0 +1,1512 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guía Completa DIAN — Sistema Tributario Oficial v4.1</title>
+    <meta name="description" content="Manual operativo completo del Bot Fiscal DIAN Bogotá D.C. Todos los rangos, comandos, flujos de trabajo y tematización del sistema tributario.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --dian-blue: #002E5D;
+            --dian-blue-light: #0A4A8A;
+            --dian-blue-glow: #1A6FCF;
+            --dian-gold: #D4A843;
+            --dian-gold-light: #F0CC6B;
+            --success: #2ECC71;
+            --error: #E74C3C;
+            --warning: #F1C40F;
+            --inspector-purple: #9B59B6;
+            --empresa-teal: #1ABC9C;
+            --bg-primary: #0A0E1A;
+            --bg-secondary: #111827;
+            --bg-card: #1A1F35;
+            --bg-card-hover: #222845;
+            --text-primary: #F1F5F9;
+            --text-secondary: #94A3B8;
+            --text-muted: #64748B;
+            --border: rgba(255, 255, 255, 0.06);
+            --border-glow: rgba(26, 111, 207, 0.3);
+            --glass: rgba(26, 31, 53, 0.7);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.7;
+            overflow-x: hidden;
+        }
+
+        /* ═══════════════════════════════════════ */
+        /*  HERO                                   */
+        /* ═══════════════════════════════════════ */
+        .hero {
+            position: relative;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            overflow: hidden;
+            background: linear-gradient(160deg, #000D1A 0%, #001E3D 40%, #002E5D 70%, #001833 100%);
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%; left: -50%;
+            width: 200%; height: 200%;
+            background:
+                radial-gradient(ellipse at 30% 50%, rgba(26,111,207,0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at 70% 30%, rgba(212,168,67,0.05) 0%, transparent 40%);
+            animation: heroGlow 12s ease-in-out infinite alternate;
+        }
+
+        @keyframes heroGlow {
+            0%   { transform: translate(0,0) rotate(0deg); }
+            100% { transform: translate(20px,-20px) rotate(3deg); }
+        }
+
+        .hero-grid {
+            position: absolute; inset: 0;
+            background-image:
+                linear-gradient(rgba(26,111,207,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(26,111,207,0.03) 1px, transparent 1px);
+            background-size: 60px 60px;
+            mask-image: radial-gradient(ellipse at center, black 30%, transparent 80%);
+        }
+
+        .hero-content {
+            position: relative; z-index: 2;
+            max-width: 850px; padding: 2rem;
+        }
+
+        .hero-badge {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 8px 20px;
+            background: rgba(212,168,67,0.1);
+            border: 1px solid rgba(212,168,67,0.25);
+            border-radius: 50px;
+            font-size: 0.8rem; font-weight: 600;
+            color: var(--dian-gold-light);
+            letter-spacing: 2px; text-transform: uppercase;
+            margin-bottom: 2rem;
+            animation: fadeInDown 0.8s ease;
+        }
+
+        .hero-badge .dot {
+            width: 6px; height: 6px;
+            background: var(--dian-gold);
+            border-radius: 50%;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%,100% { opacity:1; transform:scale(1); }
+            50%     { opacity:0.5; transform:scale(0.8); }
+        }
+
+        .hero h1 {
+            font-size: clamp(2rem, 5vw, 3.6rem);
+            font-weight: 900; letter-spacing: -1px; line-height: 1.1;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, #FFF 0%, #D4E4F7 40%, #D4A843 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: fadeInUp 1s ease;
+        }
+
+        .hero p {
+            font-size: 1.1rem; color: var(--text-secondary);
+            max-width: 650px; margin: 0 auto 1.5rem;
+            animation: fadeInUp 1.2s ease;
+        }
+
+        .hero-stats {
+            display: flex; gap: 2rem; justify-content: center; flex-wrap: wrap;
+            margin-top: 2rem;
+            animation: fadeInUp 1.4s ease;
+        }
+
+        .hero-stat {
+            text-align: center;
+        }
+
+        .hero-stat .num {
+            font-size: 2rem; font-weight: 900;
+            background: linear-gradient(135deg, var(--dian-gold-light), var(--dian-gold));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+
+        .hero-stat .label {
+            font-size: 0.75rem; color: var(--text-muted);
+            letter-spacing: 1px; text-transform: uppercase;
+        }
+
+        .scroll-indicator {
+            position: absolute; bottom: 40px; left: 50%;
+            transform: translateX(-50%);
+            display: flex; flex-direction: column; align-items: center; gap: 8px;
+            color: var(--text-muted); font-size: 0.75rem;
+            letter-spacing: 2px; text-transform: uppercase;
+            animation: bounce 2s ease-in-out infinite;
+        }
+        .scroll-indicator .line {
+            width: 1px; height: 40px;
+            background: linear-gradient(to bottom, var(--dian-blue-glow), transparent);
+        }
+
+        @keyframes bounce {
+            0%,100% { transform: translateX(-50%) translateY(0); }
+            50%     { transform: translateX(-50%) translateY(10px); }
+        }
+        @keyframes fadeInUp {
+            from { opacity:0; transform:translateY(30px); }
+            to   { opacity:1; transform:translateY(0); }
+        }
+        @keyframes fadeInDown {
+            from { opacity:0; transform:translateY(-20px); }
+            to   { opacity:1; transform:translateY(0); }
+        }
+
+        /* ═══════════════════════════════════════ */
+        /*  NAVIGATION                             */
+        /* ═══════════════════════════════════════ */
+        .nav {
+            position: sticky; top: 0; z-index: 100;
+            background: rgba(10,14,26,0.88);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            padding: 0 2rem;
+        }
+        .nav-inner {
+            max-width: 1200px; margin: 0 auto;
+            display: flex; align-items: center; gap: 1.5rem;
+            overflow-x: auto; scrollbar-width: none;
+            padding: 1rem 0;
+        }
+        .nav-inner::-webkit-scrollbar { display: none; }
+        .nav-logo {
+            font-weight: 800; font-size: 0.85rem;
+            color: var(--dian-gold); white-space: nowrap; letter-spacing: 1px;
+        }
+        .nav a {
+            color: var(--text-muted); text-decoration: none;
+            font-size: 0.8rem; font-weight: 500;
+            white-space: nowrap; transition: color 0.2s; padding: 4px 0;
+        }
+        .nav a:hover { color: var(--text-primary); }
+
+        /* ═══════════════════════════════════════ */
+        /*  MAIN CONTENT                           */
+        /* ═══════════════════════════════════════ */
+        .content {
+            max-width: 1040px;
+            margin: 0 auto;
+            padding: 4rem 2rem 6rem;
+        }
+
+        /* ═══════════════════════════════════════ */
+        /*  SECTIONS                               */
+        /* ═══════════════════════════════════════ */
+        .section { margin-bottom: 5rem; }
+        .section-header {
+            display: flex; align-items: center; gap: 16px;
+            margin-bottom: 2rem; padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+        .section-icon {
+            width: 48px; height: 48px;
+            display: flex; align-items: center; justify-content: center;
+            border-radius: 14px; font-size: 1.4rem; flex-shrink: 0;
+        }
+        .section-icon.blue   { background: linear-gradient(135deg, rgba(26,111,207,0.15), rgba(26,111,207,0.05)); border: 1px solid rgba(26,111,207,0.2); }
+        .section-icon.gold   { background: linear-gradient(135deg, rgba(212,168,67,0.15), rgba(212,168,67,0.05)); border: 1px solid rgba(212,168,67,0.2); }
+        .section-icon.green  { background: linear-gradient(135deg, rgba(46,204,113,0.15), rgba(46,204,113,0.05)); border: 1px solid rgba(46,204,113,0.2); }
+        .section-icon.red    { background: linear-gradient(135deg, rgba(231,76,60,0.15), rgba(231,76,60,0.05)); border: 1px solid rgba(231,76,60,0.2); }
+        .section-icon.purple { background: linear-gradient(135deg, rgba(155,89,182,0.15), rgba(155,89,182,0.05)); border: 1px solid rgba(155,89,182,0.2); }
+        .section-icon.teal   { background: linear-gradient(135deg, rgba(26,188,156,0.15), rgba(26,188,156,0.05)); border: 1px solid rgba(26,188,156,0.2); }
+        .section-title { font-size: 1.6rem; font-weight: 800; letter-spacing: -0.5px; }
+        .section-subtitle { font-size: 0.85rem; color: var(--text-muted); margin-top: 2px; }
+
+        /* ═══════════════════════════════════════ */
+        /*  CARDS                                  */
+        /* ═══════════════════════════════════════ */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px; padding: 2rem;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s ease;
+        }
+        .card:hover {
+            border-color: var(--border-glow);
+            background: var(--bg-card-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+        }
+        .card-title {
+            font-size: 1.1rem; font-weight: 700;
+            margin-bottom: 0.75rem;
+            display: flex; align-items: center; gap: 10px;
+        }
+        .card-description {
+            color: var(--text-secondary); font-size: 0.92rem;
+            margin-bottom: 1rem;
+        }
+
+        /* ═══════════════════════════════════════ */
+        /*  COMMAND BLOCKS                         */
+        /* ═══════════════════════════════════════ */
+        .cmd-block {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden; margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+        .cmd-block:hover { border-color: var(--border-glow); box-shadow: 0 4px 20px rgba(0,0,0,0.2); }
+        .cmd-header {
+            display: flex; align-items: center; gap: 12px;
+            padding: 1rem 1.5rem;
+            cursor: pointer; user-select: none;
+            transition: background 0.2s;
+        }
+        .cmd-header:hover { background: rgba(255,255,255,0.02); }
+        .cmd-name {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.92rem; font-weight: 600;
+            color: var(--dian-blue-glow); flex: 1;
+        }
+        .cmd-tag {
+            padding: 3px 10px; border-radius: 6px;
+            font-size: 0.65rem; font-weight: 600;
+            letter-spacing: 0.5px; text-transform: uppercase;
+        }
+        .cmd-tag.director   { background: rgba(212,168,67,0.12); color: var(--dian-gold-light); border: 1px solid rgba(212,168,67,0.2); }
+        .cmd-tag.recaudador { background: rgba(46,204,113,0.12); color: var(--success); border: 1px solid rgba(46,204,113,0.2); }
+        .cmd-tag.sancionador{ background: rgba(231,76,60,0.12); color: var(--error); border: 1px solid rgba(231,76,60,0.2); }
+        .cmd-tag.inspector  { background: rgba(155,89,182,0.12); color: var(--inspector-purple); border: 1px solid rgba(155,89,182,0.2); }
+        .cmd-tag.public     { background: rgba(26,188,156,0.12); color: var(--empresa-teal); border: 1px solid rgba(26,188,156,0.2); }
+        .cmd-tag.staff      { background: rgba(26,111,207,0.12); color: var(--dian-blue-glow); border: 1px solid rgba(26,111,207,0.2); }
+        .cmd-chevron {
+            color: var(--text-muted); transition: transform 0.3s ease; font-size: 0.8rem;
+        }
+        .cmd-block.open .cmd-chevron { transform: rotate(180deg); }
+        .cmd-body {
+            max-height: 0; overflow: hidden;
+            transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .cmd-block.open .cmd-body { max-height: 2000px; }
+        .cmd-content { padding: 0 1.5rem 1.5rem; }
+        .cmd-desc {
+            color: var(--text-secondary); font-size: 0.88rem;
+            margin-bottom: 1rem; padding-top: 0.5rem;
+            border-top: 1px solid var(--border);
+        }
+
+        /* Params */
+        .params-title {
+            font-size: 0.72rem; font-weight: 600;
+            color: var(--text-muted); letter-spacing: 1.5px;
+            text-transform: uppercase; margin-bottom: 0.6rem;
+        }
+        .param {
+            display: flex; align-items: flex-start; gap: 10px;
+            padding: 8px 12px;
+            background: rgba(0,0,0,0.2); border-radius: 10px;
+            margin-bottom: 4px;
+        }
+        .param-name {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem; color: var(--dian-gold-light);
+            white-space: nowrap; min-width: 100px;
+        }
+        .param-desc { font-size: 0.8rem; color: var(--text-secondary); }
+        .param-req {
+            font-size: 0.62rem; padding: 1px 6px;
+            background: rgba(231,76,60,0.15); color: var(--error);
+            border-radius: 4px; font-weight: 600; white-space: nowrap;
+        }
+
+        /* Alerts */
+        .alert {
+            padding: 1.25rem 1.5rem; border-radius: 12px;
+            margin-bottom: 1.25rem;
+            display: flex; gap: 14px; align-items: flex-start;
+        }
+        .alert-icon { font-size: 1.2rem; flex-shrink: 0; margin-top: 2px; }
+        .alert-content { flex: 1; }
+        .alert-title { font-weight: 700; font-size: 0.88rem; margin-bottom: 4px; }
+        .alert p { font-size: 0.84rem; color: var(--text-secondary); }
+        .alert.warning { background: rgba(241,196,15,0.06); border: 1px solid rgba(241,196,15,0.15); }
+        .alert.warning .alert-title { color: var(--warning); }
+        .alert.danger { background: rgba(231,76,60,0.06); border: 1px solid rgba(231,76,60,0.15); }
+        .alert.danger .alert-title { color: var(--error); }
+        .alert.info { background: rgba(26,111,207,0.06); border: 1px solid rgba(26,111,207,0.15); }
+        .alert.info .alert-title { color: var(--dian-blue-glow); }
+        .alert.success { background: rgba(46,204,113,0.06); border: 1px solid rgba(46,204,113,0.15); }
+        .alert.success .alert-title { color: var(--success); }
+
+        /* Hierarchy */
+        .hierarchy {
+            display: flex; flex-direction: column;
+            align-items: center; gap: 0; margin: 2rem 0;
+        }
+        .hierarchy-item {
+            width: 100%; max-width: 500px;
+            padding: 1rem 1.5rem; border-radius: 12px;
+            text-align: center; position: relative;
+            transition: all 0.3s ease;
+        }
+        .hierarchy-item:hover { transform: scale(1.02); }
+        .hierarchy-item.top { background: linear-gradient(135deg, rgba(212,168,67,0.12), rgba(212,168,67,0.04)); border: 1px solid rgba(212,168,67,0.25); }
+        .hierarchy-item.mid { background: linear-gradient(135deg, rgba(26,111,207,0.1), rgba(26,111,207,0.03)); border: 1px solid rgba(26,111,207,0.2); }
+        .hierarchy-item.low { background: linear-gradient(135deg, rgba(148,163,184,0.08), rgba(148,163,184,0.02)); border: 1px solid rgba(148,163,184,0.15); }
+        .hierarchy-item.green-h { background: linear-gradient(135deg, rgba(46,204,113,0.1), rgba(46,204,113,0.03)); border: 1px solid rgba(46,204,113,0.2); }
+        .hierarchy-item.red-h { background: linear-gradient(135deg, rgba(231,76,60,0.1), rgba(231,76,60,0.03)); border: 1px solid rgba(231,76,60,0.2); }
+        .hierarchy-item.purple-h { background: linear-gradient(135deg, rgba(155,89,182,0.1), rgba(155,89,182,0.03)); border: 1px solid rgba(155,89,182,0.2); }
+        .hierarchy-connector { width: 2px; height: 24px; background: linear-gradient(to bottom, var(--border-glow), var(--border)); }
+        .hierarchy-rank { font-weight: 700; font-size: 1rem; }
+        .hierarchy-desc { font-size: 0.8rem; color: var(--text-muted); margin-top: 2px; }
+
+        /* Flow steps */
+        .flow { position: relative; padding-left: 2.5rem; }
+        .flow::before {
+            content: ''; position: absolute;
+            left: 14px; top: 0; bottom: 0; width: 2px;
+            background: linear-gradient(to bottom, var(--dian-blue-glow), var(--dian-gold), transparent);
+        }
+        .flow-step { position: relative; padding: 0.8rem 0 1.5rem; }
+        .flow-step:last-child { padding-bottom: 0; }
+        .flow-dot {
+            position: absolute; left: -2.5rem; top: 0.9rem;
+            width: 28px; height: 28px; border-radius: 50%;
+            background: var(--bg-card);
+            border: 2px solid var(--dian-blue-glow);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.7rem; font-weight: 700;
+            color: var(--dian-blue-glow); z-index: 1;
+        }
+        .flow-title { font-weight: 700; font-size: 0.95rem; margin-bottom: 4px; }
+        .flow-desc { font-size: 0.86rem; color: var(--text-secondary); }
+
+        /* Tables */
+        .table-wrapper {
+            overflow-x: auto; border-radius: 12px;
+            border: 1px solid var(--border); margin-bottom: 1.5rem;
+        }
+        table { width: 100%; border-collapse: collapse; font-size: 0.84rem; }
+        thead { background: rgba(26,111,207,0.08); }
+        th {
+            padding: 12px 16px; text-align: left;
+            font-weight: 600; color: var(--text-secondary);
+            font-size: 0.72rem; letter-spacing: 1px;
+            text-transform: uppercase;
+            border-bottom: 1px solid var(--border);
+        }
+        td { padding: 12px 16px; border-bottom: 1px solid var(--border); color: var(--text-secondary); }
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background: rgba(255,255,255,0.02); }
+        td code {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem; padding: 2px 8px;
+            background: rgba(26,111,207,0.1); border-radius: 5px;
+            color: var(--dian-blue-glow);
+        }
+
+        /* Subsections */
+        .subsection {
+            margin: 2rem 0 1.5rem;
+            font-size: 1.15rem; font-weight: 700;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px dashed rgba(255,255,255,0.08);
+        }
+
+        /* Tabs */
+        .tab-group { display: flex; gap: 4px; margin-bottom: 1.5rem; flex-wrap: wrap; }
+        .tab-btn {
+            padding: 8px 18px; border-radius: 10px;
+            font-size: 0.82rem; font-weight: 600;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid var(--border);
+            color: var(--text-muted); cursor: pointer;
+            transition: all 0.25s ease;
+        }
+        .tab-btn:hover { background: rgba(255,255,255,0.06); color: var(--text-primary); }
+        .tab-btn.active {
+            background: rgba(26,111,207,0.12);
+            border-color: rgba(26,111,207,0.3);
+            color: var(--dian-blue-glow);
+        }
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; }
+
+        /* Fiscal badge */
+        .fiscal-badge {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 4px 14px; border-radius: 8px;
+            font-size: 0.78rem; font-weight: 600;
+        }
+        .fiscal-badge.renta { background: rgba(241,196,15,0.1); color: var(--warning); border: 1px solid rgba(241,196,15,0.2); }
+        .fiscal-badge.patrimonio { background: rgba(26,111,207,0.1); color: var(--dian-blue-glow); border: 1px solid rgba(26,111,207,0.2); }
+        .fiscal-badge.ica { background: rgba(26,188,156,0.1); color: var(--empresa-teal); border: 1px solid rgba(26,188,156,0.2); }
+        .fiscal-badge.multa { background: rgba(231,76,60,0.1); color: var(--error); border: 1px solid rgba(231,76,60,0.2); }
+
+        /* List styles */
+        .custom-list { list-style: none; padding: 0; }
+        .custom-list li {
+            padding: 8px 14px; margin-bottom: 6px;
+            background: rgba(0,0,0,0.15); border-radius: 10px;
+            font-size: 0.88rem; color: var(--text-secondary);
+            display: flex; gap: 10px; align-items: flex-start;
+        }
+        .custom-list li::before { content: '▸'; color: var(--dian-gold); font-weight: 700; flex-shrink: 0; }
+
+        /* Grid */
+        .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+
+        /* Footer */
+        .footer {
+            text-align: center; padding: 3rem 2rem;
+            border-top: 1px solid var(--border);
+            color: var(--text-muted); font-size: 0.8rem;
+        }
+        .footer-logo { font-weight: 800; color: var(--dian-gold); font-size: 0.9rem; margin-bottom: 0.5rem; }
+
+        /* PDF badge */
+        .pdf-list { display: flex; flex-wrap: wrap; gap: 8px; margin: 1rem 0; }
+        .pdf-badge {
+            padding: 6px 14px; border-radius: 10px;
+            font-size: 0.78rem; font-weight: 600;
+            background: rgba(231,76,60,0.08);
+            border: 1px solid rgba(231,76,60,0.15);
+            color: #E57373;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 1.8rem; }
+            .content { padding: 2rem 1rem 4rem; }
+            .cmd-header { padding: 0.8rem 1rem; }
+            .cmd-name { font-size: 0.82rem; }
+            .grid-2 { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!--  HERO                                                  -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="hero" id="inicio">
+    <div class="hero-grid"></div>
+    <div class="hero-content">
+        <div class="hero-badge">
+            <span class="dot"></span> DIAN — Manual Operativo v4.1
+        </div>
+        <h1>Guía Completa del Sistema Tributario</h1>
+        <p>Manual integral para todos los rangos y funcionarios de la DIAN Seccional Bogotá D.C. Comandos, flujos de trabajo, tematización fiscal y recursos humanos.</p>
+        <div class="hero-stats">
+            <div class="hero-stat">
+                <div class="num">77</div>
+                <div class="label">Comandos</div>
+            </div>
+            <div class="hero-stat">
+                <div class="num">5</div>
+                <div class="label">Rangos</div>
+            </div>
+            <div class="hero-stat">
+                <div class="num">10</div>
+                <div class="label">PDFs</div>
+            </div>
+            <div class="hero-stat">
+                <div class="num">8</div>
+                <div class="label">Modelos DB</div>
+            </div>
+        </div>
+    </div>
+    <div class="scroll-indicator">
+        EXPLORAR
+        <div class="line"></div>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!--  NAVIGATION                                            -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<nav class="nav">
+    <div class="nav-inner">
+        <span class="nav-logo">DIAN</span>
+        <a href="#tematica">Temática</a>
+        <a href="#jerarquia">Jerarquía</a>
+        <a href="#ciudadano">Ciudadano</a>
+        <a href="#empresa">Empresas</a>
+        <a href="#recaudador">Recaudador</a>
+        <a href="#sancionador">Sancionador</a>
+        <a href="#inspector">Inspector</a>
+        <a href="#director">Director</a>
+        <a href="#fiscal">Fiscal</a>
+        <a href="#pdfs">PDFs</a>
+        <a href="#flujos">Flujos</a>
+        <a href="#rrhh">RRHH</a>
+    </div>
+</nav>
+
+<main class="content">
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!--  1. TEMATIZACIÓN DEL SISTEMA                           -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <section class="section" id="tematica">
+        <div class="section-header">
+            <div class="section-icon blue">🏛️</div>
+            <div>
+                <div class="section-title">Tematización del Sistema</div>
+                <div class="section-subtitle">Cómo la DIAN está representada en Discord</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">🇨🇴 ¿Qué es la DIAN en este contexto?</div>
+            <div class="card-description">
+                El bot DIAN v4.1 es un <strong>sistema tributario de roleplay</strong> ambientado en la Dirección de Impuestos y Aduanas Nacionales de Colombia, Seccional Bogotá D.C. Simula de forma realista el funcionamiento fiscal de una entidad gubernamental dentro de un servidor de Discord.
+            </div>
+            <ul class="custom-list">
+                <li>Cada usuario del servidor es un <strong>ciudadano contribuyente</strong> que debe inscribirse en el RUT.</li>
+                <li>Existe un sistema de <strong>patrimonio, bienes, empresas e impuestos</strong> que funciona como una economía simulada.</li>
+                <li>Los funcionarios (roles) gestionan cobros, sanciones, auditorías y reportes a la Fiscalía.</li>
+                <li>Todos los actos generan PDFs oficiales y se registran automáticamente en logs.</li>
+                <li>El sistema usa <strong>MongoDB</strong> para persistencia y <strong>pdfkit</strong> para documentos formales.</li>
+            </ul>
+        </div>
+
+        <div class="card">
+            <div class="card-title">🎨 Identidad Visual Institucional</div>
+            <div class="card-description">El bot maneja una paleta de colores institucional que refleja seriedad gubernamental:</div>
+            <div class="grid-2">
+                <div style="padding:12px;border-radius:10px;background:rgba(27,42,74,0.4);border:1px solid rgba(27,42,74,0.6);">
+                    <strong style="color:#4A7FC7">#1B2A4A</strong> — Azul Institucional (primario)
+                </div>
+                <div style="padding:12px;border-radius:10px;background:rgba(26,92,56,0.3);border:1px solid rgba(26,92,56,0.5);">
+                    <strong style="color:#2ECC71">#1A5C38</strong> — Verde Aprobación (éxito)
+                </div>
+                <div style="padding:12px;border-radius:10px;background:rgba(123,79,0,0.3);border:1px solid rgba(123,79,0,0.5);">
+                    <strong style="color:#D4A843">#7B4F00</strong> — Ocre Advertencia (alerta)
+                </div>
+                <div style="padding:12px;border-radius:10px;background:rgba(123,0,0,0.3);border:1px solid rgba(123,0,0,0.5);">
+                    <strong style="color:#E74C3C">#7B0000</strong> — Rojo Oficial (peligro)
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">🗄️ Modelos de Base de Datos (MongoDB)</div>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr><th>Modelo</th><th>Propósito</th><th>Campos Clave</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td><code>DIAN_Ciudadano</code></td><td>Registro Único Tributario de cada usuario</td><td>userId, nombreLegal, patrimonioLiquido, nivelRiesgo, esSospechoso</td></tr>
+                        <tr><td><code>DIAN_Bien</code></td><td>Bienes patrimoniales declarados</td><td>bienId, tipoActivo, valorAvaluo, referencia</td></tr>
+                        <tr><td><code>DIAN_Factura</code></td><td>Obligaciones tributarias (cobros/multas)</td><td>folioId, valorTotal, tipoDeuda, estado</td></tr>
+                        <tr><td><code>DIAN_Empresa</code></td><td>Empresas registradas en Cámara de Comercio</td><td>nitEmpresa, nombreEmpresa, capitalEmpresa, estadoEmpresa</td></tr>
+                        <tr><td><code>DIAN_Declaracion</code></td><td>Declaraciones de ingresos mensuales</td><td>periodo, montoDeclarado, estado (A_TIEMPO/TARDIA/OMITIDA)</td></tr>
+                        <tr><td><code>DIAN_Auditoria</code></td><td>Procesos de auditoría fiscal</td><td>auditoriaId, motivo, estado, fechaLimite</td></tr>
+                        <tr><td><code>DIAN_OrdenRegistro</code></td><td>Órdenes para ciudadanos sin RUT</td><td>ordenId, estado (PENDIENTE/CUMPLIDA/DESACATO)</td></tr>
+                        <tr><td><code>DIAN_AcuerdoPago</code></td><td>Acuerdos de pago fraccionado</td><td>deudaTotal, montoPorCuota, cuotasPagadas, cuotasTotal</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!--  2. JERARQUÍA Y RANGOS                                 -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <section class="section" id="jerarquia">
+        <div class="section-header">
+            <div class="section-icon gold">👔</div>
+            <div>
+                <div class="section-title">Jerarquía y Rangos</div>
+                <div class="section-subtitle">Estructura organizacional de la DIAN</div>
+            </div>
+        </div>
+
+        <div class="hierarchy">
+            <div class="hierarchy-item top">
+                <div class="hierarchy-rank">🏅 Director General</div>
+                <div class="hierarchy-desc">Máxima autoridad. Control total del sistema. Panel de control, amnistía, procesos diarios, purgas.</div>
+            </div>
+            <div class="hierarchy-connector"></div>
+            <div class="hierarchy-item red-h">
+                <div class="hierarchy-rank">⚖️ Agente Sancionador</div>
+                <div class="hierarchy-desc">Multas, embargos, evasor fiscal, órdenes a Fiscalía, suspensión/liquidación de empresas.</div>
+            </div>
+            <div class="hierarchy-connector"></div>
+            <div class="hierarchy-item green-h">
+                <div class="hierarchy-rank">💰 Recaudador</div>
+                <div class="hierarchy-desc">Cobros, liquidación de impuestos, registros de pago, auditorías, acuerdos de pago, órdenes de registro.</div>
+            </div>
+            <div class="hierarchy-connector"></div>
+            <div class="hierarchy-item purple-h">
+                <div class="hierarchy-rank">🔍 Inspector del Gobierno</div>
+                <div class="hierarchy-desc">Consulta y vigilancia. Reportes fiscales, listado de morosos. Solo lectura, no puede modificar datos.</div>
+            </div>
+            <div class="hierarchy-connector"></div>
+            <div class="hierarchy-item low">
+                <div class="hierarchy-rank">🧑‍💼 Ciudadano Contribuyente</div>
+                <div class="hierarchy-desc">Se registra en el RUT, declara bienes/ingresos, registra empresa, consulta su estado.</div>
+            </div>
+        </div>
+
+        <div class="alert info">
+            <div class="alert-icon">ℹ️</div>
+            <div class="alert-content">
+                <div class="alert-title">Herencia de Permisos</div>
+                <p>El Director General hereda automáticamente los permisos de Recaudador, Sancionador e Inspector. No necesita esos roles explícitamente.</p>
+            </div>
+        </div>
+
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr><th>Rango</th><th>ID Rol Discord</th><th>Prefijo Comandos</th><th>Permisos</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>Director General</td><td><code>1487295161590349995</code></td><td><code>dir-</code></td><td>Todo el sistema</td></tr>
+                    <tr><td>Agente Sancionador</td><td><code>1487298665025507329</code></td><td><code>admin-</code> (sanciones)</td><td>Multas, embargos, evasor, empresas</td></tr>
+                    <tr><td>Recaudador</td><td><code>1487905294402195650</code></td><td><code>admin-</code> (recaudo)</td><td>Cobros, pagos, auditorías</td></tr>
+                    <tr><td>Inspector del Gobierno</td><td><code>1487299945860960387</code></td><td><code>inspector-</code></td><td>Solo consulta</td></tr>
+                    <tr><td>Ciudadano</td><td>Ninguno requerido</td><td><code>dian-</code> / <code>empresa-</code></td><td>Autogestión</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!--  3. COMANDOS DE CIUDADANO                              -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <section class="section" id="ciudadano">
+        <div class="section-header">
+            <div class="section-icon teal">🧑‍💼</div>
+            <div>
+                <div class="section-title">Comandos del Ciudadano</div>
+                <div class="section-subtitle">Autogestión tributaria — Disponibles para todos</div>
+            </div>
+        </div>
+
+        <div class="cmd-block">
+            <div class="cmd-header" onclick="this.parentElement.classList.toggle('open')">
+                <span class="cmd-name">/dian-registrar</span>
+                <span class="cmd-tag public">PÚBLICO</span>
+                <span class="cmd-chevron">▼</span>
+            </div>
+            <div class="cmd-body"><div class="cmd-content">
+                <div class="cmd-desc">Inscripción en el Registro Único Tributario. Genera PDF del RUT y lo envía por DM. Requisito obligatorio para toda actividad económica.</div>
+                <div class="params-title">Parámetros</div>
+                <div class="param"><span class="param-name">nombre</span><span class="param-req">REQUERIDO</span><span class="param-desc">Nombre legal completo del ciudadano</span></div>
+                <div class="param"><span class="param-name">banco</span><span class="param-req">REQUERIDO</span><span class="param-desc">Saldo actual en cuentas bancarias (COP)</span></div>
+            </div></div>
+        </div>
+
+        <div class="cmd-block">
+            <div class="cmd-header" onclick="this.parentElement.classList.toggle('open')">
+                <span class="cmd-name">/dian-perfil</span>
+                <span class="cmd-tag public">PÚBLICO</span>
+                <span class="cmd-chevron">▼</span>
+            </div>
+            <div class="cmd-body"><div class="cmd-content">
+                <div class="cmd-desc">Muestra el expediente tributario unificado completo: patrimonio, bienes, deudas, empresa, nivel de riesgo, próxima declaración y anotaciones.</div>
+            </div></div>
+        </div>
+
+        <div class="cmd-block">
+            <div class="cmd-header" onclick="this.parentElement.classList.toggle('open')">
+                <span class="cmd-name">/dian-declarar-dinero</span>
+                <span class="cmd-tag public">PÚBLICO</span>
+                <span class="cmd-chevron">▼</span>
+            </div>
+            <div class="cmd-body"><div class="cmd-content">
+                <div class="cmd-desc">Actualiza el saldo bancario personal en el RUT. Bloqueado si el RUT está embargado.</div>
+                <div class="param"><span class="param-name">monto</span><span class="param-req">REQUERIDO</span><span class="param-desc">Saldo actual en cuentas (COP)</span></div>
+            </div></div>
+        </div>
+
+        <div class="cmd-block">
+            <div class="cmd-header" onclick="this.parentElement.classList.toggle('open')">
+                <span class="cmd-name">/dian-declarar-activo</span>
+                <span class="cmd-tag public">PÚBLICO</span>
+                <span class="cmd-chevron">▼</span>
+            </div>
+            <div class="cmd-body"><div class="cmd-content">
+                <div class="cmd-desc">Declara un bien patrimonial (inmueble, vehículo o títulos financieros). Genera un ID único tipo BIE-XXXXXX.</div>
+                <div class="param"><span class="param-name">tipo</span><span class="param-req">REQUERIDO</span><span class="param-desc">Inmueble / Vehículo / Financiero</span></div>
+                <div class="param"><span class="param-name">avaluo</span><span class="param-req">REQUERIDO</span><span class="param-desc">Valor comercial en COP</span></div>
+                <div class="param"><span class="param-name">referencia</span><span class="param-req">REQUERIDO</span><span class="param-desc">Placa, matrícula o dirección</span></div>
+            </div></div>
+        </div>
+
+        <div class="cmd-block">
+            <div class="cmd-header" onclick="this.parentElement.classList.toggle('open')">
+                <span class="cmd-name">/dian-declarar-ingresos</span>
+                <span class="cmd-tag public">PÚBLICO</span>
+                <span class="cmd-chevron">▼</span>
+            </div>
+            <div class="cmd-body"><div class="cmd-content">
+                <div class="cmd-desc">Declaración mensual obligatoria de ingresos. Si se presenta después del día 5, queda marcada como TARDÍA. Solo una por periodo (YYYY-MM).</div>
+                <div class="param"><span class="param-name">monto</span><span class="param-req">REQUERIDO</span><span class="param-desc">Total de ingresos del mes en COP</span></div>
+            </div></div>
+        </div>
+
+        <div class="cmd-block">
+            <div class="cmd-header" onclick="this.parentElement.classList.toggle('open')">
+                <span class="cmd-name">/dian-mis-facturas</span>
+                <span class="cmd-tag public">PÚBLICO</span>
+                <span class="cmd-chevron">▼</span>
+            </div>
+            <div class="cmd-body"><div class="cmd-content">
+                <div class="cmd-desc">Lista todas las facturas del ciudadano: vigentes, pagadas y anuladas.</div>
+            </div></div>
+        </div>
+
+        <div class="cmd-block">
+            <div class="cmd-header" onclick="this.parentElement.classList.toggle('open')">
+                <span class="cmd-name">/dian-mis-activos</span>
+                <span class="cmd-tag public">PÚBLICO</span>
+                <span class="cmd-chevron">▼</span>
+            </div>
+            <div class="cmd-body"><div class="cmd-content">
+                <div class="cmd-desc">Muestra bienes patrimoniales declarados con valor total acumulado.</div>
+            </div></div>
+        </div>
+
+        <div class="cmd-block">
+            <div class="cmd-header" onclick="this.parentElement.classList.toggle('open')">
+                <span class="cmd-name">/dian-mis-declaraciones</span>
+                <span class="cmd-tag public">PÚBLICO</span>
+                <span class="cmd-chevron">▼</span>
+            </div>
+            <div class="cmd-body"><div class="cmd-content">
+                <div class="cmd-desc">Historial de todas las declaraciones de ingresos con estado (OK/TARDE/OMITIDA) e índice de cumplimiento.</div>
+            </div></div>
+        </div>
+
+        <div class="cmd-block">
+            <div class="cmd-header" onclick="this.parentElement.classList.toggle('open')">
+                <span class="cmd-name">/dian-historial</span>
+                <span class="cmd-tag public">PÚBLICO</span>
+                <span class="cmd-chevron">▼</span>
+            </div>
+            <div class="cmd-body"><div class="cmd-content">
+                <div class="cmd-desc">Resumen de pagos históricos y últimas 10 facturas pagadas.</div>
+            </div></div>
+        </div>
+
+        <div class="cmd-block">
+            <div class="cmd-header" onclick="this.parentElement.classList.toggle('open')">
+                <span class="cmd-name">/dian-verificar-nit</span>
+                <span class="cmd-tag public">PÚBLICO</span>
+                <span class="cmd-chevron">▼</span>
+            </div>
+            <div class="cmd-body"><div class="cmd-content">
+                <div class="cmd-desc">Verifica si un NIT de empresa existe en el sistema. Disponible para cualquier ciudadano.</div>
+                <div class="param"><span class="param-name">nit</span><span class="param-req">REQUERIDO</span><span class="param-desc">NIT a verificar (ej: BOG-900123456)</span></div>
+            </div></div>
+        </div>
+
+        <div class="cmd-block">
+            <div class="cmd-header" onclick="this.parentElement.classList.toggle('open')">
+                <span class="cmd-name">/dian-estado</span>
+                <span class="cmd-tag public">PÚBLICO</span>
+                <span class="cmd-chevron">▼</span>
+            </div>
+            <div class="cmd-body"><div class="cmd-content">
+                <div class="cmd-desc">Ver el estado actual del sistema (Operativo / Mantenimiento / Caído).</div>
+            </div></div>
+        </div>
+
+        <div class="cmd-block">
+            <div class="cmd-header" onclick="this.parentElement.classList.toggle('open')">
+                <span class="cmd-name">/dian-certificado-contribuyente</span>
+                <span class="cmd-tag public">PÚBLICO</span>
+                <span class="cmd-chevron">▼</span>
+            </div>
+            <div class="cmd-body"><div class="cmd-content">
+                <div class="cmd-desc">Genera un PDF oficial de certificado de contribuyente activo.</div>
+            </div></div>
+        </div>
+
+        <div class="cmd-block">
+            <div class="cmd-header" onclick="this.parentElement.classList.toggle('open')">
+                <span class="cmd-name">/dian-top-declarantes</span>
+                <span class="cmd-tag public">PÚBLICO</span>
+                <span class="cmd-chevron">▼</span>
+            </div>
+            <div class="cmd-body"><div class="cmd-content">
+                <div class="cmd-desc">Ranking público de los 10 ciudadanos con mayores ingresos declarados en el periodo actual.</div>
+            </div></div>
+        </div>
+
+        <div class="cmd-block">
+            <div class="cmd-header" onclick="this.parentElement.classList.toggle('open')">
+                <span class="cmd-name">/dian-top-deudores</span>
+                <span class="cmd-tag public">PÚBLICO</span>
+                <span class="cmd-chevron">▼</span>
+            </div>
+            <div class="cmd-body"><div class="cmd-content">
+                <div class="cmd-desc">Ranking público de los 10 ciudadanos con mayor deuda vigente acumulada.</div>
+            </div></div>
+        </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!--  4. COMANDOS DE EMPRESAS                               -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <section class="section" id="empresa">
+        <div class="section-header">
+            <div class="section-icon teal">🏢</div>
+            <div>
+                <div class="section-title">Módulo Empresarial</div>
+                <div class="section-subtitle">Cámara de Comercio — Registro y gestión de empresas</div>
+            </div>
+        </div>
+
+        <div class="cmd-block">
+            <div class="cmd-header" onclick="this.parentElement.classList.toggle('open')">
+                <span class="cmd-name">/empresa-registrar</span>
+                <span class="cmd-tag public">PÚBLICO</span>
+                <span class="cmd-chevron">▼</span>
+            </div>
+            <div class="cmd-body"><div class="cmd-content">
+                <div class="cmd-desc">Constituye una empresa ante la Cámara de Comercio. Genera NIT automático (formato BOG-9XXXXXXXX) y envía certificado PDF por DM. Requiere RUT previo. Máximo 1 empresa por ciudadano.</div>
+                <div class="param"><span class="param-name">nombre</span><span class="param-req">REQUERIDO</span><span class="param-desc">Razón social de la empresa</span></div>
+                <div class="param"><span class="param-name">actividad</span><span class="param-req">REQUERIDO</span><span class="param-desc">Actividad económica</span></div>
+                <div class="param"><span class="param-name">capital</span><span class="param-req">REQUERIDO</span><span class="param-desc">Capital inicial en caja (COP)</span></div>
+            </div></div>
+        </div>
+
+        <div class="cmd-block">
+            <div class="cmd-header" onclick="this.parentElement.classList.toggle('open')">
+                <span class="cmd-name">/empresa-perfil</span>
+                <span class="cmd-tag public">PÚBLICO</span>
+                <span class="cmd-chevron">▼</span>
+            </div>
+            <div class="cmd-body"><div class="cmd-content">
+                <div class="cmd-desc">Consulta el estado de tu empresa: NIT, estado, actividad, capital en caja y fecha de constitución.</div>
+            </div></div>
+        </div>
+
+        <div class="cmd-block">
+            <div class="cmd-header" onclick="this.parentElement.classList.toggle('open')">
+                <span class="cmd-name">/empresa-declarar-capital</span>
+                <span class="cmd-tag public">PÚBLICO</span>
+                <span class="cmd-chevron">▼</span>
+            </div>
+            <div class="cmd-body"><div class="cmd-content">
+                <div class="cmd-desc">Actualiza el capital en caja de la empresa. Solo funciona si la empresa está Activa.</div>
+                <div class="param"><span class="param-name">monto</span><span class="param-req">REQUERIDO</span><span class="param-desc">Capital actual (COP)</span></div>
+            </div></div>
+        </div>
+
+        <div class="cmd-block">
+            <div class="cmd-header" onclick="this.parentElement.classList.toggle('open')">
+                <span class="cmd-name">/empresa-certificado</span>
+                <span class="cmd-tag public">PÚBLICO</span>
+                <span class="cmd-chevron">▼</span>
+            </div>
+            <div class="cmd-body"><div class="cmd-content">
+                <div class="cmd-desc">Regenera el certificado de Cámara de Comercio en PDF.</div>
+            </div></div>
+        </div>
+
+        <div class="cmd-block">
+            <div class="cmd-header" onclick="this.parentElement.classList.toggle('open')">
+                <span class="cmd-name">/empresa-listar-publica</span>
+                <span class="cmd-tag public">PÚBLICO</span>
+                <span class="cmd-chevron">▼</span>
+            </div>
+            <div class="cmd-body"><div class="cmd-content">
+                <div class="cmd-desc">Listado público de todas las empresas activas registradas en el distrito, ordenadas por capital.</div>
+            </div></div>
+        </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!--  5. RECAUDADOR                                         -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <section class="section" id="recaudador">
+        <div class="section-header">
+            <div class="section-icon green">💰</div>
+            <div>
+                <div class="section-title">Recaudador</div>
+                <div class="section-subtitle">Cobros, liquidación de impuestos, auditorías y acuerdos de pago</div>
+            </div>
+        </div>
+
+        <div class="alert info">
+            <div class="alert-icon">💼</div>
+            <div class="alert-content">
+                <div class="alert-title">Rol requerido: Recaudador o Director</div>
+                <p>Todos los comandos de esta sección requieren el rol de Recaudador. El Director hereda estos permisos automáticamente.</p>
+            </div>
+        </div>
+
+        <div class="cmd-block"><div class="cmd-header" onclick="this.parentElement.classList.toggle('open')"><span class="cmd-name">/admin-consultar</span><span class="cmd-tag recaudador">RECAUDO</span><span class="cmd-chevron">▼</span></div><div class="cmd-body"><div class="cmd-content"><div class="cmd-desc">Ver expediente tributario completo de un ciudadano (igual que /dian-perfil pero para otro usuario).</div><div class="param"><span class="param-name">usuario</span><span class="param-req">REQUERIDO</span><span class="param-desc">Contribuyente a consultar</span></div></div></div></div>
+
+        <div class="cmd-block"><div class="cmd-header" onclick="this.parentElement.classList.toggle('open')"><span class="cmd-name">/admin-listar</span><span class="cmd-tag recaudador">RECAUDO</span><span class="cmd-chevron">▼</span></div><div class="cmd-body"><div class="cmd-content"><div class="cmd-desc">Lista completa del padrón tributario: todos los contribuyentes ordenados por patrimonio. Muestra estado [E]=Embargado [A]=Activo [EMP]=Tiene empresa.</div></div></div></div>
+
+        <div class="cmd-block"><div class="cmd-header" onclick="this.parentElement.classList.toggle('open')"><span class="cmd-name">/admin-cobrar</span><span class="cmd-tag recaudador">RECAUDO</span><span class="cmd-chevron">▼</span></div><div class="cmd-body"><div class="cmd-content"><div class="cmd-desc">Emite cobro manual tipo IMPUESTO. Genera factura, registra en logs y notifica por DM.</div><div class="param"><span class="param-name">usuario</span><span class="param-req">REQUERIDO</span><span class="param-desc">Contribuyente</span></div><div class="param"><span class="param-name">valor</span><span class="param-req">REQUERIDO</span><span class="param-desc">Monto en COP</span></div><div class="param"><span class="param-name">concepto</span><span class="param-req">REQUERIDO</span><span class="param-desc">Razón del cobro</span></div></div></div></div>
+
+        <div class="cmd-block"><div class="cmd-header" onclick="this.parentElement.classList.toggle('open')"><span class="cmd-name">/admin-liquidar-patrimonio</span><span class="cmd-tag recaudador">RECAUDO</span><span class="cmd-chevron">▼</span></div><div class="cmd-body"><div class="cmd-content"><div class="cmd-desc">Calcula y cobra impuesto a la riqueza. Tramos: 1% si patrimonio ≥ $50M, 2% si ≥ $150M. Respeta periodo de 30 días entre cobros (opción forzar disponible).</div><div class="param"><span class="param-name">usuario</span><span class="param-req">REQUERIDO</span><span class="param-desc">Contribuyente</span></div><div class="param"><span class="param-name">forzar</span><span class="param-desc">Ignorar control de periodo</span></div></div></div></div>
+
+        <div class="cmd-block"><div class="cmd-header" onclick="this.parentElement.classList.toggle('open')"><span class="cmd-name">/admin-declaracion-renta</span><span class="cmd-tag recaudador">RECAUDO</span><span class="cmd-chevron">▼</span></div><div class="cmd-body"><div class="cmd-content"><div class="cmd-desc">Liquida declaración de renta al 19% sobre la base gravable (patrimonio bruto menos 1.400 UVT = $65.891.000). Solo aplica si el ciudadano supera el tope.</div><div class="param"><span class="param-name">usuario</span><span class="param-req">REQUERIDO</span><span class="param-desc">Contribuyente</span></div><div class="param"><span class="param-name">forzar</span><span class="param-desc">Ignorar control de periodo</span></div></div></div></div>
+
+        <div class="cmd-block"><div class="cmd-header" onclick="this.parentElement.classList.toggle('open')"><span class="cmd-name">/admin-liquidar-ica</span><span class="cmd-tag recaudador">RECAUDO</span><span class="cmd-chevron">▼</span></div><div class="cmd-body"><div class="cmd-content"><div class="cmd-desc">Cobra ICA (Industria y Comercio) al 0.5% sobre capital de empresa. Solo si la empresa tiene capital ≥ $20M.</div><div class="param"><span class="param-name">usuario</span><span class="param-req">REQUERIDO</span><span class="param-desc">Dueño de la empresa</span></div></div></div></div>
+
+        <div class="cmd-block"><div class="cmd-header" onclick="this.parentElement.classList.toggle('open')"><span class="cmd-name">/admin-registrar-pago</span><span class="cmd-tag recaudador">RECAUDO</span><span class="cmd-chevron">▼</span></div><div class="cmd-body"><div class="cmd-content"><div class="cmd-desc">Registra pago de una factura vigente. Genera PDF de comprobante. Si no quedan deudas, genera además Paz y Salvo automáticamente. Todo se envía por DM.</div><div class="param"><span class="param-name">folio</span><span class="param-req">REQUERIDO</span><span class="param-desc">Número de folio de la factura</span></div></div></div></div>
+
+        <div class="cmd-block"><div class="cmd-header" onclick="this.parentElement.classList.toggle('open')"><span class="cmd-name">/admin-anular-factura</span><span class="cmd-tag recaudador">RECAUDO</span><span class="cmd-chevron">▼</span></div><div class="cmd-body"><div class="cmd-content"><div class="cmd-desc">Anula una factura vigente emitida por error.</div><div class="param"><span class="param-name">folio</span><span class="param-req">REQUERIDO</span><span class="param-desc">Número de folio</span></div><div class="param"><span class="param-name">motivo</span><span class="param-req">REQUERIDO</span><span class="param-desc">Razón de la anulación</span></div></div></div></div>
+
+        <div class="cmd-block"><div class="cmd-header" onclick="this.parentElement.classList.toggle('open')"><span class="cmd-name">/admin-estado-mora</span><span class="cmd-tag recaudador">RECAUDO</span><span class="cmd-chevron">▼</span></div><div class="cmd-body"><div class="cmd-content"><div class="cmd-desc">Lista de ciudadanos con deuda vigente, ordenados por monto total.</div></div></div></div>
+
+        <div class="cmd-block"><div class="cmd-header" onclick="this.parentElement.classList.toggle('open')"><span class="cmd-name">/admin-empresa-consultar</span><span class="cmd-tag recaudador">RECAUDO</span><span class="cmd-chevron">▼</span></div><div class="cmd-body"><div class="cmd-content"><div class="cmd-desc">Consulta empresa de un ciudadano.</div><div class="param"><span class="param-name">usuario</span><span class="param-req">REQUERIDO</span><span class="param-desc">Dueño de la empresa</span></div></div></div></div>
+
+        <div class="cmd-block"><div class="cmd-header" onclick="this.parentElement.classList.toggle('open')"><span class="cmd-name">/admin-buscar-nit</span><span class="cmd-tag recaudador">RECAUDO</span><span class="cmd-chevron">▼</span></div><div class="cmd-body"><div class="cmd-content"><div class="cmd-desc">Buscar empresa por su NIT.</div><div class="param"><span class="param-name">nit</span><span class="param-req">REQUERIDO</span><span class="param-desc">NIT de la empresa</span></div></div></div></div>
+
+        <div class="cmd-block"><div class="cmd-header" onclick="this.parentElement.classList.toggle('open')"><span class="cmd-name">/admin-ver-declaraciones</span><span class="cmd-tag recaudador">RECAUDO</span><span class="cmd-chevron">▼</span></div><div class="cmd-body"><div class="cmd-content"><div class="cmd-desc">Ver historial de declaraciones de ingresos de un ciudadano con índice de cumplimiento.</div><div class="param"><span class="param-name">usuario</span><span class="param-req">REQUERIDO</span><span class="param-desc">Ciudadano</span></div></div></div></div>
+
+        <div class="cmd-block"><div class="cmd-header" onclick="this.parentElement.classList.toggle('open')"><span class="cmd-name">/admin-abrir-auditoria</span><span class="cmd-tag recaudador">RECAUDO</span><span class="cmd-chevron">▼</span></div><div class="cmd-body"><div class="cmd-content"><div class="cmd-desc">Inicia un proceso de auditoría fiscal. El ciudadano tiene 3 días para responder o será multado y reportado a Fiscalía.</div><div class="param"><span class="param-name">usuario</span><span class="param-req">REQUERIDO</span><span class="param-desc">Ciudadano a auditar</span></div><div class="param"><span class="param-name">motivo</span><span class="param-req">REQUERIDO</span><span class="param-desc">Motivo de la auditoría</span></div></div></div></div>
+
+        <div class="cmd-block"><div class="cmd-header" onclick="this.parentElement.classList.toggle('open')"><span class="cmd-name">/admin-cerrar-auditoria</span><span class="cmd-tag recaudador">RECAUDO</span><span class="cmd-chevron">▼</span></div><div class="cmd-body"><div class="cmd-content"><div class="cmd-desc">Cierra auditoría sin sanción (el ciudadano justificó satisfactoriamente).</div><div class="param"><span class="param-name">usuario</span><span class="param-req">REQUERIDO</span><span class="param-desc">Ciudadano</span></div></div></div></div>
+
+        <div class="cmd-block"><div class="cmd-header" onclick="this.parentElement.classList.toggle('open')"><span class="cmd-name">/admin-orden-registro</span><span class="cmd-tag recaudador">RECAUDO</span><span class="cmd-chevron">▼</span></div><div class="cmd-body"><div class="cmd-content"><div class="cmd-desc">Emite orden de registro obligatorio a un usuario sin RUT. Plazo de 5 días. Multa de $5M si no cumple + $8M por cada periodo sin registro.</div><div class="param"><span class="param-name">usuario</span><span class="param-req">REQUERIDO</span><span class="param-desc">Usuario sin RUT</span></div></div></div></div>
+
+        <div class="cmd-block"><div class="cmd-header" onclick="this.parentElement.classList.toggle('open')"><span class="cmd-name">/admin-verificar-registro</span><span class="cmd-tag recaudador">RECAUDO</span><span class="cmd-chevron">▼</span></div><div class="cmd-body"><div class="cmd-content"><div class="cmd-desc">Verifica si el ciudadano cumplió la orden de registro. Si no se registró: DESACATO ($5M). Si se registró: cobra retroactivo ($8M × periodos sin RUT).</div><div class="param"><span class="param-name">usuario</span><span class="param-req">REQUERIDO</span><span class="param-desc">Usuario</span></div><div class="param"><span class="param-name">periodos_sin_rut</span><span class="param-req">REQUERIDO</span><span class="param-desc">Cuántos periodos operó sin RUT</span></div></div></div></div>
+
+        <div class="cmd-block"><div class="cmd-header" onclick="this.parentElement.classList.toggle('open')"><span class="cmd-name">/admin-acuerdo-pago</span><span class="cmd-tag recaudador">RECAUDO</span><span class="cmd-chevron">▼</span></div><div class="cmd-body"><div class="cmd-content"><div class="cmd-desc">Crea acuerdo de pago fraccionado. Solo 1 acuerdo activo por ciudadano. Si incumple cuotas, se procede con embargo.</div><div class="param"><span class="param-name">usuario</span><span class="param-req">REQUERIDO</span><span class="param-desc">Ciudadano</span></div><div class="param"><span class="param-name">deuda_total</span><span class="param-req">REQUERIDO</span><span class="param-desc">Monto total de la deuda</span></div><div class="param"><span class="param-name">cuotas</span><span class="param-req">REQUERIDO</span><span class="param-desc">Número de cuotas</span></div></div></div></div>
+
+        <div class="cmd-block"><div class="cmd-header" onclick="this.parentElement.classList.toggle('open')"><span class="cmd-name">/admin-pagar-cuota</span><span class="cmd-tag recaudador">RECAUDO</span><span class="cmd-chevron">▼</span></div><div class="cmd-body"><div class="cmd-content"><div class="cmd-desc">Registra pago de una cuota del acuerdo. Cuando se completan todas las cuotas, el acuerdo cambia a COMPLETADO.</div><div class="param"><span class="param-name">usuario</span><span class="param-req">REQUERIDO</span><span class="param-desc">Ciudadano</span></div></div></div></div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!--  6. SANCIONADOR                                        -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <section class="section" id="sancionador">
+        <div class="section-header">
+            <div class="section-icon red">⚖️</div>
+            <div>
+                <div class="section-title">Agente Sancionador</div>
+                <div class="section-subtitle">Multas, embargos, evasor fiscal y reportes a Fiscalía</div>
+            </div>
+        </div>
+
+        <div class="cmd-block"><div class="cmd-header" onclick="this.parentElement.classList.toggle('open')"><span class="cmd-name">/admin-multar</span><span class="cmd-tag sancionador">SANCIÓN</span><span class="cmd-chevron">▼</span></div><div class="cmd-body"><div class="cmd-content"><div class="cmd-desc">Emite multa disciplinaria. Automáticamente eleva el nivel de riesgo a ALTO. Notifica al ciudadano por DM.</div><div class="param"><span class="param-name">usuario</span><span class="param-req">REQUERIDO</span><span class="param-desc">Infractor</span></div><div class="param"><span class="param-name">valor</span><span class="param-req">REQUERIDO</span><span class="param-desc">Monto de la multa</span></div><div class="param"><span class="param-name">motivo</span><span class="param-req">REQUERIDO</span><span class="param-desc">Razón legal</span></div></div></div></div>
+
+        <div class="cmd-block"><div class="cmd-header" onclick="this.parentElement.classList.toggle('open')"><span class="cmd-name">/admin-embargar</span><span class="cmd-tag sancionador">SANCIÓN</span><span class="cmd-chevron">▼</span></div><div class="cmd-body"><div class="cmd-content"><div class="cmd-desc">Embarga el RUT del ciudadano. Estado → Embargado, riesgo → Crítico. Bloquea declarar dinero, activos y capital empresarial.</div><div class="param"><span class="param-name">usuario</span><span class="param-req">REQUERIDO</span><span class="param-desc">Contribuyente</span></div><div class="param"><span class="param-name">resolucion</span><span class="param-req">REQUERIDO</span><span class="param-desc">Justificación legal</span></div></div></div></div>
+
+        <div class="cmd-block"><div class="cmd-header" onclick="this.parentElement.classList.toggle('open')"><span class="cmd-name">/admin-levantar-embargo</span><span class="cmd-tag sancionador">SANCIÓN</span><span class="cmd-chevron">▼</span></div><div class="cmd-body"><div class="cmd-content"><div class="cmd-desc">Restaura el RUT a Activo. Riesgo queda en Medio.</div><div class="param"><span class="param-name">usuario</span><span class="param-req">REQUERIDO</span><span class="param-desc">Ciudadano</span></div></div></div></div>
+
+        <div class="cmd-block"><div class="cmd-header" onclick="this.parentElement.classList.toggle('open')"><span class="cmd-name">/admin-evasor</span><span class="cmd-tag sancionador">SANCIÓN</span><span class="cmd-chevron">▼</span></div><div class="cmd-body"><div class="cmd-content"><div class="cmd-desc">Asigna o quita el rol de Evasor Fiscal en Discord.</div><div class="param"><span class="param-name">usuario</span><span class="param-req">REQUERIDO</span><span class="param-desc">Ciudadano</span></div><div class="param"><span class="param-name">accion</span><span class="param-req">REQUERIDO</span><span class="param-desc">Asignar / Quitar</span></div></div></div></div>
+
+        <div class="cmd-block"><div class="cmd-header" onclick="this.parentElement.classList.toggle('open')"><span class="cmd-name">/admin-historial-sanciones</span><span class="cmd-tag sancionador">SANCIÓN</span><span class="cmd-chevron">▼</span></div><div class="cmd-body"><div class="cmd-content"><div class="cmd-desc">Muestra todas las multas (vigentes y pagadas) con total acumulado, nivel de riesgo y anotaciones.</div><div class="param"><span class="param-name">usuario</span><span class="param-req">REQUERIDO</span><span class="param-desc">Ciudadano</span></div></div></div></div>
+
+        <div class="cmd-block"><div class="cmd-header" onclick="this.parentElement.classList.toggle('open')"><span class="cmd-name">/admin-empresa-suspender</span><span class="cmd-tag sancionador">SANCIÓN</span><span class="cmd-chevron">▼</span></div><div class="cmd-body"><div class="cmd-content"><div class="cmd-desc">Suspende una empresa. No puede declarar capital mientras está suspendida.</div><div class="param"><span class="param-name">usuario</span><span class="param-req">REQUERIDO</span><span class="param-desc">Dueño</span></div><div class="param"><span class="param-name">motivo</span><span class="param-req">REQUERIDO</span><span class="param-desc">Motivo</span></div></div></div></div>
+
+        <div class="cmd-block"><div class="cmd-header" onclick="this.parentElement.classList.toggle('open')"><span class="cmd-name">/admin-empresa-liquidar</span><span class="cmd-tag sancionador">SANCIÓN</span><span class="cmd-chevron">▼</span></div><div class="cmd-body"><div class="cmd-content"><div class="cmd-desc">Liquida una empresa definitivamente. Los datos se conservan en el sistema como registro histórico.</div><div class="param"><span class="param-name">usuario</span><span class="param-req">REQUERIDO</span><span class="param-desc">Dueño</span></div><div class="param"><span class="param-name">motivo</span><span class="param-req">REQUERIDO</span><span class="param-desc">Motivo</span></div></div></div></div>
+
+        <div class="cmd-block"><div class="cmd-header" onclick="this.parentElement.classList.toggle('open')"><span class="cmd-name">/admin-empresa-reactivar</span><span class="cmd-tag sancionador">SANCIÓN</span><span class="cmd-chevron">▼</span></div><div class="cmd-body"><div class="cmd-content"><div class="cmd-desc">Reactiva una empresa que estaba Suspendida.</div><div class="param"><span class="param-name">usuario</span><span class="param-req">REQUERIDO</span><span class="param-desc">Dueño</span></div></div></div></div>
+
+        <div class="cmd-block"><div class="cmd-header" onclick="this.parentElement.classList.toggle('open')"><span class="cmd-name">/admin-orden-fiscal</span><span class="cmd-tag sancionador">SANCIÓN</span><span class="cmd-chevron">▼</span></div><div class="cmd-body"><div class="cmd-content"><div class="cmd-desc">Emite orden fiscal formal hacia la Fiscalía del Distrito. Genera PDF con expediente completo, incluye declaraciones, deudas y periodos omitidos.</div><div class="param"><span class="param-name">usuario</span><span class="param-req">REQUERIDO</span><span class="param-desc">Ciudadano investigado</span></div><div class="param"><span class="param-name">motivo</span><span class="param-req">REQUERIDO</span><span class="param-desc">Motivo de la orden</span></div></div></div></div>
+
+        <div class="cmd-block"><div class="cmd-header" onclick="this.parentElement.classList.toggle('open')"><span class="cmd-name">/admin-orden-fiscal-manual</span><span class="cmd-tag sancionador">SANCIÓN</span><span class="cmd-chevron">▼</span></div><div class="cmd-body"><div class="cmd-content"><div class="cmd-desc">Orden fiscal extraordinaria para evasores totales SIN RUT. Genera PDF con estimación patrimonial.</div><div class="param"><span class="param-name">usuario</span><span class="param-req">REQUERIDO</span><span class="param-desc">Usuario Discord</span></div><div class="param"><span class="param-name">nombre</span><span class="param-req">REQUERIDO</span><span class="param-desc">Nombre observado</span></div><div class="param"><span class="param-name">motivo</span><span class="param-req">REQUERIDO</span><span class="param-desc">Razón del reporte</span></div><div class="param"><span class="param-name">patrimonio_estimado</span><span class="param-req">REQUERIDO</span><span class="param-desc">Monto estimado en COP</span></div></div></div></div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!--  7. INSPECTOR                                          -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <section class="section" id="inspector">
+        <div class="section-header">
+            <div class="section-icon purple">🔍</div>
+            <div>
+                <div class="section-title">Inspector del Gobierno</div>
+                <div class="section-subtitle">Vigilancia y consulta — Solo lectura</div>
+            </div>
+        </div>
+
+        <div class="alert warning">
+            <div class="alert-icon">⚠️</div>
+            <div class="alert-content">
+                <div class="alert-title">Permisos de solo lectura</div>
+                <p>Los inspectores NO pueden modificar datos, emitir cobros ni sancionar. Su función es estrictamente de vigilancia y reporte.</p>
+            </div>
+        </div>
+
+        <div class="cmd-block"><div class="cmd-header" onclick="this.parentElement.classList.toggle('open')"><span class="cmd-name">/inspector-consultar</span><span class="cmd-tag inspector">INSPECTOR</span><span class="cmd-chevron">▼</span></div><div class="cmd-body"><div class="cmd-content"><div class="cmd-desc">Expediente tributario completo de un ciudadano. Se registra en logs que el inspector realizó la consulta.</div><div class="param"><span class="param-name">usuario</span><span class="param-req">REQUERIDO</span><span class="param-desc">Ciudadano</span></div></div></div></div>
+
+        <div class="cmd-block"><div class="cmd-header" onclick="this.parentElement.classList.toggle('open')"><span class="cmd-name">/inspector-empresa</span><span class="cmd-tag inspector">INSPECTOR</span><span class="cmd-chevron">▼</span></div><div class="cmd-body"><div class="cmd-content"><div class="cmd-desc">Consulta la empresa de un ciudadano.</div><div class="param"><span class="param-name">usuario</span><span class="param-req">REQUERIDO</span><span class="param-desc">Ciudadano</span></div></div></div></div>
+
+        <div class="cmd-block"><div class="cmd-header" onclick="this.parentElement.classList.toggle('open')"><span class="cmd-name">/inspector-buscar-nit</span><span class="cmd-tag inspector">INSPECTOR</span><span class="cmd-chevron">▼</span></div><div class="cmd-body"><div class="cmd-content"><div class="cmd-desc">Busca empresa por NIT.</div><div class="param"><span class="param-name">nit</span><span class="param-req">REQUERIDO</span><span class="param-desc">NIT de la empresa</span></div></div></div></div>
+
+        <div class="cmd-block"><div class="cmd-header" onclick="this.parentElement.classList.toggle('open')"><span class="cmd-name">/inspector-listar-morosos</span><span class="cmd-tag inspector">INSPECTOR</span><span class="cmd-chevron">▼</span></div><div class="cmd-body"><div class="cmd-content"><div class="cmd-desc">Lista de ciudadanos con deuda vigente, uso exclusivo de inspectores.</div></div></div></div>
+
+        <div class="cmd-block"><div class="cmd-header" onclick="this.parentElement.classList.toggle('open')"><span class="cmd-name">/inspector-reporte</span><span class="cmd-tag inspector">INSPECTOR</span><span class="cmd-chevron">▼</span></div><div class="cmd-body"><div class="cmd-content"><div class="cmd-desc">Genera reporte fiscal general completo con métricas macroeconómicas (PIB simulado, cartera, recaudo) + PDF oficial.</div></div></div></div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!--  8. DIRECTOR GENERAL                                   -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <section class="section" id="director">
+        <div class="section-header">
+            <div class="section-icon gold">🏅</div>
+            <div>
+                <div class="section-title">Director General</div>
+                <div class="section-subtitle">Control total del sistema — Máxima autoridad</div>
+            </div>
+        </div>
+
+        <div class="alert danger">
+            <div class="alert-icon">🔒</div>
+            <div class="alert-content">
+                <div class="alert-title">Acceso exclusivo: Director General</div>
+                <p>Estos comandos son de nivel máximo. El Director también tiene acceso a TODOS los comandos de Recaudador, Sancionador e Inspector.</p>
+            </div>
+        </div>
+
+        <div class="cmd-block"><div class="cmd-header" onclick="this.parentElement.classList.toggle('open')"><span class="cmd-name">/dir-tesoro</span><span class="cmd-tag director">DIRECCIÓN</span><span class="cmd-chevron">▼</span></div><div class="cmd-body"><div class="cmd-content"><div class="cmd-desc">Balance macroeconómico completo: PIB simulado, banco ciudadanos, capital empresas, bienes, cartera en mora, desglose por tipo de impuesto y total recaudado histórico.</div></div></div></div>
+
+        <div class="cmd-block"><div class="cmd-header" onclick="this.parentElement.classList.toggle('open')"><span class="cmd-name">/dir-panel</span><span class="cmd-tag director">DIRECCIÓN</span><span class="cmd-chevron">▼</span></div><div class="cmd-body"><div class="cmd-content"><div class="cmd-desc">Panel de control interactivo con botones para un ciudadano: editar nombre, ajustar patrimonio, cambiar riesgo, agregar anotación, saldar deudas, reset historial, reset declaración, generar historial PDF, marcar/desmarcar sospechoso, y si tiene empresa: editar capital, nombre, actividad o borrarla.</div><div class="param"><span class="param-name">usuario</span><span class="param-req">REQUERIDO</span><span class="param-desc">Ciudadano</span></div></div></div></div>
+
+        <div class="cmd-block"><div class="cmd-header" onclick="this.parentElement.classList.toggle('open')"><span class="cmd-name">/dir-estado-sistema</span><span class="cmd-tag director">DIRECCIÓN</span><span class="cmd-chevron">▼</span></div><div class="cmd-body"><div class="cmd-content"><div class="cmd-desc">Publica estado del sistema: Operativo / Mantenimiento / Caído. Visible en el anuncio público.</div><div class="param"><span class="param-name">estado</span><span class="param-req">REQUERIDO</span><span class="param-desc">operativo / mantenimiento / caido</span></div></div></div></div>
+
+        <div class="cmd-block"><div class="cmd-header" onclick="this.parentElement.classList.toggle('open')"><span class="cmd-name">/dir-notificar-declaracion</span><span class="cmd-tag director">DIRECCIÓN</span><span class="cmd-chevron">▼</span></div><div class="cmd-body"><div class="cmd-content"><div class="cmd-desc">Envía DM masivo a todos los ciudadanos recordando la declaración. Diferencia entre quienes ya declararon y quienes están pendientes.</div></div></div></div>
+
+        <div class="cmd-block"><div class="cmd-header" onclick="this.parentElement.classList.toggle('open')"><span class="cmd-name">/dir-notificar-dia3</span><span class="cmd-tag director">DIRECCIÓN</span><span class="cmd-chevron">▼</span></div><div class="cmd-body"><div class="cmd-content"><div class="cmd-desc">Alerta especial de día 3: aviso urgente a quienes no han declarado este periodo. Advierte de la multa automática de $5M.</div></div></div></div>
+
+        <div class="cmd-block"><div class="cmd-header" onclick="this.parentElement.classList.toggle('open')"><span class="cmd-name">/dir-procesar-omisos</span><span class="cmd-tag director">DIRECCIÓN</span><span class="cmd-chevron">▼</span></div><div class="cmd-body"><div class="cmd-content"><div class="cmd-desc">Procesa automáticamente todos los ciudadanos que NO declararon: registra como OMITIDA, emite multa de $5M y escala nivel de riesgo por reincidencia (≥3 = Alto, ≥5 = Crítico).</div></div></div></div>
+
+        <div class="cmd-block"><div class="cmd-header" onclick="this.parentElement.classList.toggle('open')"><span class="cmd-name">/dir-amnistia</span><span class="cmd-tag director">DIRECCIÓN</span><span class="cmd-chevron">▼</span></div><div class="cmd-body"><div class="cmd-content"><div class="cmd-desc">Abre periodo de amnistía fiscal con porcentaje de descuento sobre deudas. Los ciudadanos deben solicitar acogerse por ticket.</div><div class="param"><span class="param-name">descuento</span><span class="param-req">REQUERIDO</span><span class="param-desc">Porcentaje de descuento (1-100)</span></div></div></div></div>
+
+        <div class="cmd-block"><div class="cmd-header" onclick="this.parentElement.classList.toggle('open')"><span class="cmd-name">/dir-cerrar-amnistia</span><span class="cmd-tag director">DIRECCIÓN</span><span class="cmd-chevron">▼</span></div><div class="cmd-body"><div class="cmd-content"><div class="cmd-desc">Cierra el periodo de amnistía fiscal activo.</div></div></div></div>
+
+        <div class="cmd-block"><div class="cmd-header" onclick="this.parentElement.classList.toggle('open')"><span class="cmd-name">/dir-procesos-diarios</span><span class="cmd-tag director">DIRECCIÓN</span><span class="cmd-chevron">▼</span></div><div class="cmd-body"><div class="cmd-content"><div class="cmd-desc">Ejecuta batch de notificaciones diarias: alerta de auditorías por vencer (≤1 día), recordatorio de cuotas atrasadas, y advertencia a quienes llevan ~2 periodos sin declarar.</div></div></div></div>
+
+        <div class="cmd-block"><div class="cmd-header" onclick="this.parentElement.classList.toggle('open')"><span class="cmd-name">/dir-transferir-empresa</span><span class="cmd-tag director">DIRECCIÓN</span><span class="cmd-chevron">▼</span></div><div class="cmd-body"><div class="cmd-content"><div class="cmd-desc">Transfiere una empresa a un nuevo dueño. El nuevo dueño debe tener RUT y no tener otra empresa.</div><div class="param"><span class="param-name">dueno_actual</span><span class="param-req">REQUERIDO</span><span class="param-desc">Dueño actual</span></div><div class="param"><span class="param-name">nuevo_dueno</span><span class="param-req">REQUERIDO</span><span class="param-desc">Nuevo propietario</span></div></div></div></div>
+
+        <div class="cmd-block"><div class="cmd-header" onclick="this.parentElement.classList.toggle('open')"><span class="cmd-name">/dir-editar-empresa</span><span class="cmd-tag director">DIRECCIÓN</span><span class="cmd-chevron">▼</span></div><div class="cmd-body"><div class="cmd-content"><div class="cmd-desc">Edita nombre o actividad económica de una empresa.</div><div class="param"><span class="param-name">propietario</span><span class="param-req">REQUERIDO</span><span class="param-desc">Propietario</span></div><div class="param"><span class="param-name">nuevo_nombre</span><span class="param-desc">Nuevo nombre (opcional)</span></div><div class="param"><span class="param-name">nueva_actividad</span><span class="param-desc">Nueva actividad (opcional)</span></div></div></div></div>
+
+        <div class="cmd-block"><div class="cmd-header" onclick="this.parentElement.classList.toggle('open')"><span class="cmd-name">/dir-borrar-empresa</span><span class="cmd-tag director">DIRECCIÓN</span><span class="cmd-chevron">▼</span></div><div class="cmd-body"><div class="cmd-content"><div class="cmd-desc">Elimina permanentemente el registro de una empresa de la base de datos.</div><div class="param"><span class="param-name">propietario</span><span class="param-req">REQUERIDO</span><span class="param-desc">Propietario</span></div></div></div></div>
+
+        <div class="cmd-block"><div class="cmd-header" onclick="this.parentElement.classList.toggle('open')"><span class="cmd-name">/dir-borrar-expediente</span><span class="cmd-tag director">DIRECCIÓN</span><span class="cmd-chevron">▼</span></div><div class="cmd-body"><div class="cmd-content"><div class="cmd-desc">PURGA: Elimina ciudadano, todos sus bienes y todas sus facturas. La empresa permanece intacta.</div><div class="param"><span class="param-name">usuario</span><span class="param-req">REQUERIDO</span><span class="param-desc">Ciudadano</span></div></div></div></div>
+
+        <div class="cmd-block"><div class="cmd-header" onclick="this.parentElement.classList.toggle('open')"><span class="cmd-name">/dir-borrar-activo</span><span class="cmd-tag director">DIRECCIÓN</span><span class="cmd-chevron">▼</span></div><div class="cmd-body"><div class="cmd-content"><div class="cmd-desc">Elimina un bien patrimonial específico por su ID.</div><div class="param"><span class="param-name">id_bien</span><span class="param-req">REQUERIDO</span><span class="param-desc">ID del bien (ej: BIE-A1B2C3)</span></div></div></div></div>
+
+        <div class="subsection">Comandos Staff (Director + Recaudador + Sancionador)</div>
+
+        <div class="cmd-block"><div class="cmd-header" onclick="this.parentElement.classList.toggle('open')"><span class="cmd-name">/admin-marcar-sospechoso</span><span class="cmd-tag staff">STAFF</span><span class="cmd-chevron">▼</span></div><div class="cmd-body"><div class="cmd-content"><div class="cmd-desc">Marca internamente a un ciudadano como sospechoso con motivo.</div><div class="param"><span class="param-name">usuario</span><span class="param-req">REQUERIDO</span><span class="param-desc">Contribuyente</span></div><div class="param"><span class="param-name">motivo</span><span class="param-req">REQUERIDO</span><span class="param-desc">Motivo de la sospecha</span></div></div></div></div>
+
+        <div class="cmd-block"><div class="cmd-header" onclick="this.parentElement.classList.toggle('open')"><span class="cmd-name">/admin-desmarcar-sospechoso</span><span class="cmd-tag staff">STAFF</span><span class="cmd-chevron">▼</span></div><div class="cmd-body"><div class="cmd-content"><div class="cmd-desc">Quita la marca de sospechoso de un ciudadano.</div><div class="param"><span class="param-name">usuario</span><span class="param-req">REQUERIDO</span><span class="param-desc">Contribuyente</span></div></div></div></div>
+
+        <div class="cmd-block"><div class="cmd-header" onclick="this.parentElement.classList.toggle('open')"><span class="cmd-name">/admin-listar-sospechosos</span><span class="cmd-tag staff">STAFF</span><span class="cmd-chevron">▼</span></div><div class="cmd-body"><div class="cmd-content"><div class="cmd-desc">Lista todos los ciudadanos marcados como sospechosos con sus motivos.</div></div></div></div>
+
+        <div class="cmd-block"><div class="cmd-header" onclick="this.parentElement.classList.toggle('open')"><span class="cmd-name">/admin-historial-completo</span><span class="cmd-tag staff">STAFF</span><span class="cmd-chevron">▼</span></div><div class="cmd-body"><div class="cmd-content"><div class="cmd-desc">Genera PDF de hoja de vida tributaria completa (2 páginas): datos personales, empresa, bienes, facturas, declaraciones, auditorías, acuerdos y órdenes.</div><div class="param"><span class="param-name">usuario</span><span class="param-req">REQUERIDO</span><span class="param-desc">Ciudadano</span></div></div></div></div>
+
+        <div class="cmd-block"><div class="cmd-header" onclick="this.parentElement.classList.toggle('open')"><span class="cmd-name">/admin-cert-empresa-verificada</span><span class="cmd-tag staff">STAFF</span><span class="cmd-chevron">▼</span></div><div class="cmd-body"><div class="cmd-content"><div class="cmd-desc">Emite sello PDF de Empresa Verificada. Requiere que la empresa esté activa y sin deudas vigentes.</div><div class="param"><span class="param-name">usuario</span><span class="param-req">REQUERIDO</span><span class="param-desc">Dueño de la empresa</span></div></div></div></div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!--  9. SISTEMA FISCAL                                     -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <section class="section" id="fiscal">
+        <div class="section-header">
+            <div class="section-icon blue">📊</div>
+            <div>
+                <div class="section-title">Sistema Fiscal</div>
+                <div class="section-subtitle">Impuestos, tasas, tramos y parámetros económicos</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">💎 Parámetros Fiscales v4.1</div>
+            <div class="table-wrapper">
+                <table>
+                    <thead><tr><th>Parámetro</th><th>Valor</th><th>Detalle</th></tr></thead>
+                    <tbody>
+                        <tr><td>UVT 2026</td><td><code>$47.065</code></td><td>Unidad de Valor Tributario base</td></tr>
+                        <tr><td>Tope Renta</td><td><code>1.400 UVT = $65.891.000</code></td><td>Umbral para obligación de declarar renta</td></tr>
+                        <tr><td>Tasa Renta</td><td><code>19%</code></td><td>Sobre la base gravable (bruto − tope)</td></tr>
+                        <tr><td>Patrimonio Tramo 1</td><td><code>≥ $50M → 1%</code></td><td>Impuesto a la riqueza tramo bajo</td></tr>
+                        <tr><td>Patrimonio Tramo 2</td><td><code>≥ $150M → 2%</code></td><td>Impuesto a la riqueza tramo alto</td></tr>
+                        <tr><td>ICA Mínimo</td><td><code>≥ $20M capital empresa</code></td><td>Umbral para cobrar ICA</td></tr>
+                        <tr><td>ICA Tasa</td><td><code>0.5%</code></td><td>Sobre capital en caja de la empresa</td></tr>
+                        <tr><td>Días Declaración</td><td><code>30 días</code></td><td>Mínimo entre periodos de declaración</td></tr>
+                        <tr><td>Multa Omisión</td><td><code>$5.000.000</code></td><td>Por no declarar ingresos en el periodo</td></tr>
+                        <tr><td>Multa Desacato</td><td><code>$5.000.000</code></td><td>Por no cumplir orden de registro</td></tr>
+                        <tr><td>Retroactivo</td><td><code>$8.000.000 × periodo</code></td><td>Por cada periodo operando sin RUT</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="grid-2">
+            <div class="card">
+                <div class="card-title"><span class="fiscal-badge patrimonio">PATRIMONIO</span></div>
+                <div class="card-description">
+                    <strong>Base de cálculo:</strong> Banco personal + Capital empresa (si activa) + Valor de todos los bienes declarados.<br>
+                    <strong>Tramos:</strong> 1% si ≥ $50M, 2% si ≥ $150M. Si no alcanza ningún tramo, no aplica.
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-title"><span class="fiscal-badge renta">RENTA</span></div>
+                <div class="card-description">
+                    <strong>Base gravable:</strong> Patrimonio bruto total − $65.891.000 (1.400 UVT).<br>
+                    <strong>Tasa:</strong> 19% sobre la base gravable. Solo aplica si el bruto supera el tope.
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-title"><span class="fiscal-badge ica">ICA</span></div>
+                <div class="card-description">
+                    <strong>Aplica:</strong> Empresas activas con capital ≥ $20M.<br>
+                    <strong>Tasa:</strong> 0.5% sobre el capital en caja de la empresa.
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-title"><span class="fiscal-badge multa">MULTAS</span></div>
+                <div class="card-description">
+                    <strong>Omisión:</strong> $5M automático por no declarar.<br>
+                    <strong>Desacato:</strong> $5M por no registrarse en plazo.<br>
+                    <strong>Retroactivo:</strong> $8M por periodo sin RUT.<br>
+                    <strong>Disciplinarias:</strong> Monto variable a criterio del sancionador.
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!--  10. PDFs GENERADOS                                    -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <section class="section" id="pdfs">
+        <div class="section-header">
+            <div class="section-icon red">📄</div>
+            <div>
+                <div class="section-title">Documentos PDF Oficiales</div>
+                <div class="section-subtitle">10 tipos de documentos generados automáticamente (pdfkit)</div>
+            </div>
+        </div>
+
+        <div class="table-wrapper">
+            <table>
+                <thead><tr><th>#</th><th>Documento</th><th>Se genera cuando...</th><th>Destinatario</th></tr></thead>
+                <tbody>
+                    <tr><td>1</td><td>Certificado RUT</td><td>/dian-registrar (automático por DM)</td><td>Ciudadano</td></tr>
+                    <tr><td>2</td><td>Cámara de Comercio</td><td>/empresa-registrar o /empresa-certificado</td><td>Ciudadano</td></tr>
+                    <tr><td>3</td><td>Comprobante de Pago</td><td>/admin-registrar-pago</td><td>Ciudadano (DM)</td></tr>
+                    <tr><td>4</td><td>Paz y Salvo</td><td>Cuando no quedan deudas vigentes tras un pago</td><td>Ciudadano (DM)</td></tr>
+                    <tr><td>5</td><td>Reporte Inspector</td><td>/inspector-reporte</td><td>Inspector (ephem)</td></tr>
+                    <tr><td>6</td><td>Orden Fiscal</td><td>/admin-orden-fiscal</td><td>Canal + Ciudadano (DM)</td></tr>
+                    <tr><td>7</td><td>Historial Completo</td><td>/admin-historial-completo o Panel Director</td><td>Staff (ephem)</td></tr>
+                    <tr><td>8</td><td>Certificado Contribuyente</td><td>/dian-certificado-contribuyente</td><td>Ciudadano</td></tr>
+                    <tr><td>9</td><td>Sello Empresa Verificada</td><td>/admin-cert-empresa-verificada</td><td>Staff (ephem)</td></tr>
+                    <tr><td>10</td><td>Orden Fiscal Manual</td><td>/admin-orden-fiscal-manual</td><td>Canal + Evasor (DM)</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!--  11. FLUJOS DE TRABAJO                                 -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <section class="section" id="flujos">
+        <div class="section-header">
+            <div class="section-icon green">🔄</div>
+            <div>
+                <div class="section-title">Flujos de Trabajo</div>
+                <div class="section-subtitle">Procesos operativos paso a paso</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">📅 Ciclo Mensual de Declaración</div>
+            <div class="flow">
+                <div class="flow-step">
+                    <div class="flow-dot">1</div>
+                    <div class="flow-title">Inicio del periodo (día 1)</div>
+                    <div class="flow-desc">Se abre el periodo YYYY-MM. Los ciudadanos pueden declarar ingresos con <code>/dian-declarar-ingresos</code>.</div>
+                </div>
+                <div class="flow-step">
+                    <div class="flow-dot">2</div>
+                    <div class="flow-title">Recordatorio DM (día 1-2)</div>
+                    <div class="flow-desc">El Director ejecuta <code>/dir-notificar-declaracion</code> para enviar recordatorios masivos.</div>
+                </div>
+                <div class="flow-step">
+                    <div class="flow-dot">3</div>
+                    <div class="flow-title">Alerta urgente (día 3)</div>
+                    <div class="flow-desc">El Director ejecuta <code>/dir-notificar-dia3</code>. Advierte de multa automática de $5M.</div>
+                </div>
+                <div class="flow-step">
+                    <div class="flow-dot">4</div>
+                    <div class="flow-title">Cierre de plazo (día 5)</div>
+                    <div class="flow-desc">Declaraciones después del día 5 quedan marcadas como TARDÍA.</div>
+                </div>
+                <div class="flow-step">
+                    <div class="flow-dot">5</div>
+                    <div class="flow-title">Procesamiento de omisos (día 6+)</div>
+                    <div class="flow-desc">El Director ejecuta <code>/dir-procesar-omisos</code>. Multa de $5M automática. Reincidentes escalan riesgo.</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">🔎 Flujo de Auditoría</div>
+            <div class="flow">
+                <div class="flow-step">
+                    <div class="flow-dot">1</div>
+                    <div class="flow-title">Apertura</div>
+                    <div class="flow-desc"><code>/admin-abrir-auditoria</code> — Se notifica por DM. Plazo de 3 días para justificarse.</div>
+                </div>
+                <div class="flow-step">
+                    <div class="flow-dot">2</div>
+                    <div class="flow-title">Alerta automática</div>
+                    <div class="flow-desc"><code>/dir-procesos-diarios</code> envía alerta si la auditoría vence en ≤1 día.</div>
+                </div>
+                <div class="flow-step">
+                    <div class="flow-dot">3a</div>
+                    <div class="flow-title">Cierre sin sanción</div>
+                    <div class="flow-desc"><code>/admin-cerrar-auditoria</code> — El ciudadano justificó satisfactoriamente.</div>
+                </div>
+                <div class="flow-step">
+                    <div class="flow-dot">3b</div>
+                    <div class="flow-title">Sanción por incumplimiento</div>
+                    <div class="flow-desc">Si no responde: <code>/admin-multar</code> + <code>/admin-orden-fiscal</code> a Fiscalía.</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">🚫 Flujo de Evasor sin RUT</div>
+            <div class="flow">
+                <div class="flow-step">
+                    <div class="flow-dot">1</div>
+                    <div class="flow-title">Detección</div>
+                    <div class="flow-desc">Se identifica a un usuario operando sin RUT.</div>
+                </div>
+                <div class="flow-step">
+                    <div class="flow-dot">2</div>
+                    <div class="flow-title">Orden de registro</div>
+                    <div class="flow-desc"><code>/admin-orden-registro</code> — Plazo de 5 días para registrarse. DM con advertencia.</div>
+                </div>
+                <div class="flow-step">
+                    <div class="flow-dot">3</div>
+                    <div class="flow-title">Verificación</div>
+                    <div class="flow-desc"><code>/admin-verificar-registro</code> — Si cumplió: cobra retroactivo ($8M × periodos). Si no: DESACATO ($5M).</div>
+                </div>
+                <div class="flow-step">
+                    <div class="flow-dot">4</div>
+                    <div class="flow-title">Caso extremo</div>
+                    <div class="flow-desc"><code>/admin-orden-fiscal-manual</code> + <code>/admin-evasor asignar</code> — Reporte a Fiscalía + rol Evasor.</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">💳 Flujo de Acuerdo de Pago</div>
+            <div class="flow">
+                <div class="flow-step">
+                    <div class="flow-dot">1</div>
+                    <div class="flow-title">Crear acuerdo</div>
+                    <div class="flow-desc"><code>/admin-acuerdo-pago</code> — Se define deuda total y número de cuotas.</div>
+                </div>
+                <div class="flow-step">
+                    <div class="flow-dot">2</div>
+                    <div class="flow-title">Pago periódico</div>
+                    <div class="flow-desc"><code>/admin-pagar-cuota</code> — Registra cada cuota pagada. Se notifica avance por DM.</div>
+                </div>
+                <div class="flow-step">
+                    <div class="flow-dot">3</div>
+                    <div class="flow-title">Monitoreo</div>
+                    <div class="flow-desc"><code>/dir-procesos-diarios</code> detecta cuotas atrasadas y envía recordatorio automático.</div>
+                </div>
+                <div class="flow-step">
+                    <div class="flow-dot">4</div>
+                    <div class="flow-title">Finalización</div>
+                    <div class="flow-desc">Al pagar la última cuota, el acuerdo cambia a COMPLETADO automáticamente.</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!--  12. RECURSOS HUMANOS                                  -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <section class="section" id="rrhh">
+        <div class="section-header">
+            <div class="section-icon purple">👥</div>
+            <div>
+                <div class="section-title">Recursos Humanos</div>
+                <div class="section-subtitle">Gestión del personal DIAN — Roles, responsabilidades y protocolos</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">📋 Protocolo de Ingreso de Personal</div>
+            <div class="card-description">Cuando un nuevo miembro se une al equipo de la DIAN:</div>
+            <div class="flow">
+                <div class="flow-step">
+                    <div class="flow-dot">1</div>
+                    <div class="flow-title">Asignación de Rol Discord</div>
+                    <div class="flow-desc">El Director asigna el rol correspondiente (Inspector, Recaudador o Sancionador) en Discord.</div>
+                </div>
+                <div class="flow-step">
+                    <div class="flow-dot">2</div>
+                    <div class="flow-title">Capacitación según rango</div>
+                    <div class="flow-desc">El nuevo funcionario debe leer esta guía completa, enfocándose en la sección de su rango asignado.</div>
+                </div>
+                <div class="flow-step">
+                    <div class="flow-dot">3</div>
+                    <div class="flow-title">Periodo de observación</div>
+                    <div class="flow-desc">Los nuevos Inspectores empiezan con consultas supervisadas. Recaudadores y Sancionadores requieren aprobación del Director para acciones mayores los primeros días.</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">🎯 Responsabilidades por Cargo</div>
+            <div class="table-wrapper">
+                <table>
+                    <thead><tr><th>Cargo</th><th>Responsabilidades Principales</th><th>Prohibiciones</th></tr></thead>
+                    <tbody>
+                        <tr>
+                            <td><strong style="color:var(--dian-gold-light)">Director General</strong></td>
+                            <td>Supervisar todo el sistema. Ejecutar procesos mensuales (declaraciones, omisos). Gestión directa vía Panel. Amnistía fiscal. Estado del sistema.</td>
+                            <td>No debe abusar de la purga de expedientes. Toda acción queda en logs.</td>
+                        </tr>
+                        <tr>
+                            <td><strong style="color:var(--error)">Sancionador</strong></td>
+                            <td>Emitir multas con justificación legal. Embargar cuando proceda. Reportar a Fiscalía. Gestionar estado de empresas infractoras.</td>
+                            <td>No puede multar sin motivo documentado. No puede modificar patrimonio ni datos personales.</td>
+                        </tr>
+                        <tr>
+                            <td><strong style="color:var(--success)">Recaudador</strong></td>
+                            <td>Liquidar impuestos (patrimonio, renta, ICA). Registrar pagos. Gestionar auditorías. Crear acuerdos de pago. Órdenes de registro.</td>
+                            <td>No puede embargar ni poner rol de evasor. No puede eliminar registros. Sin acceso a panel del Director.</td>
+                        </tr>
+                        <tr>
+                            <td><strong style="color:var(--inspector-purple)">Inspector</strong></td>
+                            <td>Consultar expedientes. Verificar empresas por NIT. Listar morosos. Generar reportes fiscales con métricas globales.</td>
+                            <td>NO puede modificar nada. Solo lectura. Toda consulta queda registrada en logs.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">🔐 Escala de Ascenso Recomendada</div>
+            <div class="card-description">Ruta de carrera sugerida para nuevos funcionarios:</div>
+            <div class="hierarchy">
+                <div class="hierarchy-item low">
+                    <div class="hierarchy-rank">Nivel 1: Inspector del Gobierno</div>
+                    <div class="hierarchy-desc">Ingreso inicial. Aprende el sistema consultando expedientes y generando reportes. Período mínimo sugerido: 1 semana.</div>
+                </div>
+                <div class="hierarchy-connector"></div>
+                <div class="hierarchy-item green-h">
+                    <div class="hierarchy-rank">Nivel 2: Recaudador</div>
+                    <div class="hierarchy-desc">Gestiona cobros y pagos. Requiere confianza demostrada y conocimiento de los parámetros fiscales.</div>
+                </div>
+                <div class="hierarchy-connector"></div>
+                <div class="hierarchy-item red-h">
+                    <div class="hierarchy-rank">Nivel 3: Agente Sancionador</div>
+                    <div class="hierarchy-desc">Poder coercitivo. Solo tras demostrar buen juicio como Recaudador. El Director supervisa las primeras acciones.</div>
+                </div>
+                <div class="hierarchy-connector"></div>
+                <div class="hierarchy-item top">
+                    <div class="hierarchy-rank">Nivel 4: Director General</div>
+                    <div class="hierarchy-desc">Máxima autoridad. Designación directa por la administración del servidor.</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">📌 Protocolo de Operaciones Diarias</div>
+            <div class="card-description">Checklist recomendado para el Director o el staff en turno:</div>
+            <ul class="custom-list">
+                <li><strong>Mañana:</strong> Ejecutar <code>/dir-procesos-diarios</code> para alertas automáticas (auditorías, cuotas, omisos prolongados).</li>
+                <li><strong>Día 1 del mes:</strong> Enviar <code>/dir-notificar-declaracion</code> — Recordatorio masivo.</li>
+                <li><strong>Día 3 del mes:</strong> Enviar <code>/dir-notificar-dia3</code> — Alerta urgente.</li>
+                <li><strong>Día 6+ del mes:</strong> Ejecutar <code>/dir-procesar-omisos</code> — Multas automáticas a quienes no declararon.</li>
+                <li><strong>Revisión semanal:</strong> Consultar <code>/admin-estado-mora</code> y <code>/admin-listar-sospechosos</code>.</li>
+                <li><strong>Verificar:</strong> <code>/dir-tesoro</code> para revisar la salud macroeconómica del distrito.</li>
+            </ul>
+        </div>
+
+        <div class="alert success">
+            <div class="alert-icon">✅</div>
+            <div class="alert-content">
+                <div class="alert-title">Principio de Trazabilidad</div>
+                <p>Toda acción realizada por cualquier funcionario queda registrada en el canal de logs con: quién lo hizo, a quién afectó, qué hizo, y cuándo. Esto garantiza transparencia y rendición de cuentas.</p>
+            </div>
+        </div>
+
+        <div class="alert warning">
+            <div class="alert-icon">⚠️</div>
+            <div class="alert-content">
+                <div class="alert-title">Notificaciones DM</div>
+                <p>Si un ciudadano tiene los DMs cerrados, el sistema registra la notificación fallida en el canal de logs automáticamente. No se pierde registro de ninguna acción.</p>
+            </div>
+        </div>
+    </section>
+
+</main>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!--  FOOTER                                                -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<footer class="footer">
+    <div class="footer-logo">DIAN — SECCIONAL BOGOTÁ D.C.</div>
+    <p>Manual Operativo Completo — Bot Fiscal Oficial v4.1</p>
+    <p style="margin-top:0.5rem">© 2026 Bo DIAN Colombia. Todos los derechos reservados. Uso interno exclusivo.</p>
+    <p style="margin-top:0.3rem;font-size:0.72rem;color:var(--text-muted)">77 comandos registrados • 10 documentos PDF • 8 modelos de datos • Sistema tributario completo</p>
+</footer>
+
+<script>
+// Auto-open first cmd-block in each section for UX
+document.addEventListener('DOMContentLoaded', () => {
+    // Smooth scroll for nav links
+    document.querySelectorAll('.nav a[href^="#"]').forEach(a => {
+        a.addEventListener('click', e => {
+            e.preventDefault();
+            const target = document.querySelector(a.getAttribute('href'));
+            if (target) {
+                const navH = document.querySelector('.nav').offsetHeight;
+                window.scrollTo({ top: target.offsetTop - navH - 20, behavior: 'smooth' });
+            }
+        });
+    });
+
+    // Intersection Observer for fade-in
+    const obs = new IntersectionObserver(entries => {
+        entries.forEach(e => {
+            if (e.isIntersecting) {
+                e.target.style.opacity = '1';
+                e.target.style.transform = 'translateY(0)';
+            }
+        });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.section').forEach(s => {
+        s.style.opacity = '0';
+        s.style.transform = 'translateY(30px)';
+        s.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+        obs.observe(s);
+    });
+});
+</script>
+
+</body>
+</html>
